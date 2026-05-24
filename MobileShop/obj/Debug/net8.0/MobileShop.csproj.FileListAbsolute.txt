@@ -266,3 +266,4 @@
 /home/momin-sheikh/Projects/MobileShopSln/MobileShop/obj/Debug/net8.0/MobileShop.pdb
 /home/momin-sheikh/Projects/MobileShopSln/MobileShop/obj/Debug/net8.0/MobileShop.genruntimeconfig.cache
 /home/momin-sheikh/Projects/MobileShopSln/MobileShop/obj/Debug/net8.0/ref/MobileShop.dll
+/home/momin-sheikh/Projects/MobileShopSln/MobileShop/obj/Debug/net8.0/MobileShop.sourcelink.json
