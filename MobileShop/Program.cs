@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MobileShop.Data;
+using MobileShop.Interfaces;
 using MobileShop.Models;
 using MobileShop.Services;
 
@@ -14,7 +15,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Register Custom Services for Dependency Injection
-builder.Services.AddScoped<IProductService, MobileShop.Services.ProductService>();
+builder.Services.AddScoped<IProductService, ProductService>();
 
 // Identity Configuration
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
