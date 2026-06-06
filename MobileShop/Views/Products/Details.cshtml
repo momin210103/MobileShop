@@ -106,17 +106,25 @@
 
                 <!-- Add to Cart -->
                 <div class="d-flex gap-3 mb-4">
-                    <div class="input-group" style="width: 130px;">
-                        <button type="button" class="btn btn-outline-secondary" onclick="this.parentNode.querySelector('input').stepDown()">
-                            <i class="bi bi-dash"></i>
+                    <form asp-controller="ShoppingCart" asp-action="AddToCart" method="post" class="d-flex align-items-center gap-2">
+                        <input type="hidden" name="productId" value="@Model.Product.Id" />
+                        <div class="input-group" style="width: 130px;">
+                            <button type="button" class="btn btn-outline-secondary" onclick="this.parentNode.querySelector('input').stepDown()">
+                                <i class="bi bi-dash"></i>
+                            </button>
+                            <input type="number" name="quantity" value="1" min="1" max="10" class="form-control text-center"/>
+                            <button type="button" class="btn btn-outline-secondary" onclick="this.parentNode.querySelector('input').stepUp()">
+                                <i class="bi bi-plus"></i>
+                            </button>
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-lg" @(Model.Product.StockQuantity <= 0 ? "disabled" : "")>
+                            <i class="bi bi-cart-plus"></i> Add to Cart
                         </button>
-                        <input type="number" name="quantity" value="1" min="1" max="10" class="form-control text-center" />
-                        <button type="button" class="btn btn-outline-secondary" onclick="this.parentNode.querySelector('input').stepUp()">
-                            <i class="bi bi-plus"></i>
-                        </button>
-                    </div>
-                    <button type="submit" class="btn btn-primary btn-lg" @(Model.Product.StockQuantity <= 0 ? "disabled" : "")>
-                        <i class="bi bi-cart-plus"></i> Add to Cart
+                    </form>
+                    <button class="btn btn-outline-danger btn-lg" 
+                            data-product-id="@Model.Product.Id" onclick="addToWishlist(@Model.Product.Id)">
+                        <i class="bi @(Model.IsInWishlist ? "bi-heart-fill" : "bi-heart")"></i>
+                        @(Model.IsInWishlist ? "In Wishlist" : "Add to Wishlist")
                     </button>
                 </div>
 

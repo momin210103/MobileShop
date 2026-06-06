@@ -43,4 +43,36 @@ $(document).ready(function () {
         }
     });
 
+
+    // Wishlist functionality
+    window.addToWishlist = function (productId) {
+        $.post('/Account/AddToWishlist', { productId: productId }, function (data) {
+            if (data.success) {
+                showToast(data.message, 'success');
+            }
+        }).fail(function () {
+            window.location.href = '/Account/Login';
+        });
+    };
+
+
+    // Toast notifications
+    window.showToast = function (message, type) {
+        var bgClass = type === 'success' ? 'bg-success' : type === 'error' ? 'bg-danger' : 'bg-info';
+        var toast = $(`<div class="toast align-items-center ${bgClass} text-white position-fixed" role="alert" style="top: 20px; right: 20px; z-index: 9999;">
+        <div class="d-flex">
+            <div class="toast-body">${message}</div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+        </div>
+    </div>`);
+
+        $('body').append(toast);
+        toast.toast({ delay: 3000 });
+        toast.toast('show');
+
+        setTimeout(function () {
+            toast.remove();
+        }, 3500);
+    };
+
 });

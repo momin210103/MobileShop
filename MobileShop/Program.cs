@@ -16,6 +16,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 // Register Custom Services for Dependency Injection
 builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IShoppingCartService, ShoppingCartService>();
+builder.Services.AddScoped<IFileService, FileService>();
 
 // Identity Configuration
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
@@ -36,6 +38,9 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
     options.AddPolicy("CustomerOnly", policy => policy.RequireRole("Customer"));
 });
+
+// Add HttpContextAccessor to access Session inside the Service layer
+builder.Services.AddHttpContextAccessor();
 
 // Session & Shopping Cart
 builder.Services.AddDistributedMemoryCache();

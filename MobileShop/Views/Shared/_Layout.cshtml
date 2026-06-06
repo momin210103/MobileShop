@@ -27,18 +27,7 @@
                         <li class="nav-item">
                             <a class="nav-link" asp-controller="Products" asp-action="Index">Products</a>
                         </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">Brands</a>
-                            <ul class="dropdown-menu">
-                                <li><a class="dropdown-item">Apple</a></li>
-                                <li><a class="dropdown-item">Samsung</a></li>
-                                <li><a class="dropdown-item">Xiaomi</a></li>
-                                <li><a class="dropdown-item">OnePlus</a></li>
-                                <li><a class="dropdown-item">Google</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item">View All</a></li>
-                            </ul>
-                        </li>
+                        @await Component.InvokeAsync("BrandsMenu")
                         <li class="nav-item">
                             <a class="nav-link">Contact</a>
                         </li>
@@ -56,19 +45,46 @@
                     <ul class="navbar-nav">
                         <!-- Cart -->
                         <li class="nav-item">
-                            <a class="nav-link position-relative">
+                            <a class="nav-link position-relative" asp-controller="ShoppingCart" asp-action="Index">
                                 <i class="bi bi-cart3 fs-5"></i>
                                 <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="cartCount">
-                                    0
+                                    @(ViewBag.CartItemCount ?? 0)
                                 </span>
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link">Login</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link">Register</a>
-                        </li>
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" data-bs-toggle="dropdown">
+                                    <i class="bi bi-person-circle"></i> @User.Identity.Name
+                                </a>
+                                <ul class="dropdown-menu dropdown-menu-end">
+                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile"><i class="bi bi-person"></i> My Profile</a></li>
+                                    <li><a class="dropdown-item" ><i class="bi bi-bag"></i> My Orders</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="Wishlist"><i class="bi bi-heart"></i> Wishlist</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    @if (User.IsInRole("Admin"))
+                                    {
+                                        <li><a class="dropdown-item"><i class="bi bi-speedometer2"></i> Admin Dashboard</a></li>
+                                        <li><hr class="dropdown-divider"></li>
+                                    }
+                                    <li>
+                                        <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                                            <button type="submit" class="dropdown-item"><i class="bi bi-box-arrow-right"></i> Logout</button>
+                                        </form>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Login">Login</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" asp-controller="Account" asp-action="Register">Register</a>
+                            </li>
+                        }
                     </ul>
                 </div>
             </div>
