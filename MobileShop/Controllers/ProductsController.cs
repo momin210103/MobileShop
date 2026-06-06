@@ -1,5 +1,8 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using MobileShop.Interfaces;
+using MobileShop.Models;
 using MobileShop.ViewModels;
 
 namespace MobileShop.Controllers
@@ -8,12 +11,14 @@ namespace MobileShop.Controllers
     {
         private readonly IProductService _productService;
         private readonly IShoppingCartService _cartService;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         // Injecting the Product Service through the constructor
-        public ProductsController(IProductService productService, IShoppingCartService cartService)
+        public ProductsController(IProductService productService, IShoppingCartService cartService, UserManager<ApplicationUser> userManager)
         {
             _productService = productService;
             _cartService = cartService;
+            _userManager = userManager;
         }
 
         /// <summary>
@@ -102,6 +107,37 @@ namespace MobileShop.Controllers
             });
 
             return Json(suggestions);
+        }
+        
+        
+        
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> AddReview(int productId, ReviewViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                TempData["Error"] = "Please fill in all required fields.";
+                return RedirectToAction(nameof(Details), new { id = productId });
+            }
+
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+
+            var result = await _productService.AddReviewAsync(productId, user.Id, model);
+            if (result)
+            {
+                TempData["Success"] = "Thank you for your review!";
+            }
+            else
+            {
+                TempData["Error"] = "Failed to add review. Please try again.";
+            }
+
+            return RedirectToAction(nameof(Details), new { id = productId });
         }
 
     }

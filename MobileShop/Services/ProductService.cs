@@ -138,8 +138,27 @@ namespace MobileShop.Services
 
     return filter;
 }
+    public async Task<bool> AddReviewAsync(int productId, string userId, ReviewViewModel review)
+    {
+        var product = await _context.Products.FindAsync(productId);
+        if (product == null) return false;
 
-}
+        var newReview = new Review
+        {
+            ProductId = productId,
+            UserId = userId,
+            Rating = review.Rating,
+            Title = review.Title,
+            Comment = review.Comment,
+            IsApproved = true // Auto-approve for now
+        };
+
+        _context.Reviews.Add(newReview);
+        await _context.SaveChangesAsync();
+        return true;
+    }
+
+    }
     
 }
 

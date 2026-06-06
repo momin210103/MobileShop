@@ -19,6 +19,8 @@ namespace MobileShop.Interfaces
         Task<List<Brand>> GetBrandsAsync(int count = 6);
         // Asynchronously gets a filtered, sorted, and paginated list of products
         Task<ProductListViewModel> GetProductsAsync(ProductListViewModel filter);
+        Task<bool> AddReviewAsync(int ProductId,string UserId,ReviewViewModel review);
+        
         
         
     }
