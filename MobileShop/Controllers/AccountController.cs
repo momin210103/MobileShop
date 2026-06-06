@@ -238,6 +238,27 @@ namespace MobileShop.Controllers
             return Json(new { success = true, message = "Already Added!" });
         }
         
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> RemoveFromWishlist(int productId)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+                return Unauthorized();
+
+            // Load the specific item directly using context
+            var item = await _context.WishlistItems
+                .FirstOrDefaultAsync(w => w.UserId == user.Id && w.ProductId == productId);
+
+            if (item != null)
+            {
+                _context.WishlistItems.Remove(item);
+                await _context.SaveChangesAsync();
+            }
+
+            return Json(new { success = true, message = "Removed from wishlist!" });
+        }
+        
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> Wishlist()
