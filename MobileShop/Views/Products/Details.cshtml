@@ -126,6 +126,12 @@
                         <i class="bi @(Model.IsInWishlist ? "bi-heart-fill" : "bi-heart")"></i>
                         @(Model.IsInWishlist ? "In Wishlist" : "Add to Wishlist")
                     </button>
+                    <button type="button"
+                            class="btn btn-outline-dark btn-lg"
+                            onclick="addToCompare(@Model.Product.Id)">
+
+                        <i class="bi bi-arrow-left-right"></i> Compare
+                    </button>
                 </div>
 
                 <!-- Key Specs Preview -->
@@ -163,6 +169,7 @@
                     </button>
                 </li>
             </ul>
+            
 
             <div class="tab-content p-4 border border-top-0 rounded-bottom">
                 <!-- Description -->

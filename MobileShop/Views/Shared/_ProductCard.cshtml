@@ -21,6 +21,7 @@
                 data-product-id="@Model.Id" onclick="addToWishlist(@Model.Id)">
             <i class="bi bi-heart"></i>
         </button>
+        
     </div>
 
     <div class="card-body d-flex flex-column">
@@ -72,6 +73,11 @@
                         <i class="bi bi-cart-plus"></i> Add
                     </button>
                 </form>
+                
+                <button class="btn btn-light btn-sm position-absolute bottom-0 start-0 m-2 compare-btn" 
+                        onclick="addToCompare(@Model.Id)">
+                    <i class="bi bi-arrow-left-right"></i>
+                </button>
             </div>
 
             <!-- Stock Alerts -->

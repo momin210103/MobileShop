@@ -74,5 +74,4 @@ $(document).ready(function () {
             toast.remove();
         }, 3500);
     };
-
 });

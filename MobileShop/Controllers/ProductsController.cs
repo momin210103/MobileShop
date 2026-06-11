@@ -139,6 +139,50 @@ namespace MobileShop.Controllers
 
             return RedirectToAction(nameof(Details), new { id = productId });
         }
+        
+        
+        public async Task<IActionResult> Compare(int[] ids)
+        {
+            if (ids == null || ids.Length < 2)
+            {
+                TempData["Error"] = "Please select at least 2 products to compare.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var products = new List<Product>();
+
+            foreach (var id in ids.Distinct().Take(4))
+            {
+                var product = await _productService.GetProductByIdAsync(id);
+
+                if (product != null)
+                {
+                    products.Add(product);
+                }
+            }
+
+            if (products.Count < 2)
+            {
+                TempData["Error"] = "Compare requires minimum 2 valid products.";
+                return RedirectToAction(nameof(Index));
+            }
+
+            var specificationNames = products
+                .SelectMany(p => p.Specifications)
+                .Select(s => s.Name)
+                .Distinct()
+                .ToList();
+
+            var viewModel = new CompareProductsViewModel
+            {
+                Products = products,
+                SpecificationNames = specificationNames
+            };
+
+            ViewBag.CartItemCount = await _cartService.GetCartItemCountAsync();
+
+            return View(viewModel);
+        }
 
     }
 }

@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "dgSpecHash": "oyfIDLTBGFI=",
+  "dgSpecHash": "Vo8opH4SNKw=",
   "success": true,
   "projectFilePath": "/home/momin-sheikh/Projects/MobileShopSln/MobileShop/MobileShop.csproj",
   "expectedPackageFiles": [
@@ -244,7 +244,7 @@
     "/home/momin-sheikh/.nuget/packages/system.xml.readerwriter/4.3.0/system.xml.readerwriter.4.3.0.nupkg.sha512",
     "/home/momin-sheikh/.nuget/packages/system.xml.xdocument/4.3.0/system.xml.xdocument.4.3.0.nupkg.sha512",
     "/home/momin-sheikh/.nuget/packages/xlparser/1.5.2/xlparser.1.5.2.nupkg.sha512",
-    "/home/momin-sheikh/.nuget/packages/microsoft.netcore.app.host.linux-x64/8.0.26/microsoft.netcore.app.host.linux-x64.8.0.26.nupkg.sha512"
+    "/home/momin-sheikh/.nuget/packages/microsoft.netcore.app.host.linux-x64/8.0.27/microsoft.netcore.app.host.linux-x64.8.0.27.nupkg.sha512"
   ],
   "logs": []
 }

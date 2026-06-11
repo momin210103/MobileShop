@@ -52,4 +52,10 @@ namespace MobileShop.ViewModels
         [StringLength(1000)]
         public string? Comment { get; set; }
     }
+    
+    public class CompareProductsViewModel
+    {
+        public List<Product> Products { get; set; } = new();
+        public List<string> SpecificationNames { get; set; } = new();
+    }
 }
