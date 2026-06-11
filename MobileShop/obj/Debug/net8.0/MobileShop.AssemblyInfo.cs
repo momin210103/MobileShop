@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("MobileShop")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c0a30ac956a3e5fa49da4cd415163ca6478e64ec")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+31c3752056e647e612b4e2a411bb84b1206a224c")]
 [assembly: System.Reflection.AssemblyProductAttribute("MobileShop")]
 [assembly: System.Reflection.AssemblyTitleAttribute("MobileShop")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
