@@ -61,12 +61,12 @@
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-end">
                                     <li><a class="dropdown-item" asp-controller="Account" asp-action="Profile"><i class="bi bi-person"></i> My Profile</a></li>
-                                    <li><a class="dropdown-item" ><i class="bi bi-bag"></i> My Orders</a></li>
+                                    <li><a class="dropdown-item" asp-controller="Account" asp-action="Orders"><i class="bi bi-bag"></i> My Orders</a></li>
                                     <li><a class="dropdown-item" asp-controller="Account" asp-action="Wishlist"><i class="bi bi-heart"></i> Wishlist</a></li>
                                     <li><hr class="dropdown-divider"></li>
                                     @if (User.IsInRole("Admin"))
                                     {
-                                        <li><a class="dropdown-item"><i class="bi bi-speedometer2"></i> Admin Dashboard</a></li>
+                                        <li><a class="dropdown-item" asp-area="Admin" asp-controller="Dashboard" asp-action="Index"><i class="bi bi-speedometer2"></i> Admin Dashboard</a></li>
                                         <li><hr class="dropdown-divider"></li>
                                     }
                                     <li>

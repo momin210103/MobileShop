@@ -85,3 +85,9 @@ public class SavedAddressViewModel
     public string Label { get; set; } = string.Empty;
     public string FullAddress { get; set; } = string.Empty;
 }
+
+public class OrderConfirmationViewModel
+{
+    public Order Order { get; set; } = null!;
+    public List<OrderItem> OrderItems { get; set; } = new List<OrderItem>();
+}

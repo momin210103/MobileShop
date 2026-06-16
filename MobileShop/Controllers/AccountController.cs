@@ -17,13 +17,14 @@ namespace MobileShop.Controllers
         private readonly ApplicationDbContext _context;  // ADD THIS
         private readonly IShoppingCartService _cartService;
         private readonly IFileService _fileService;
+        private readonly IOrderService _orderService;
 
         public AccountController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
             RoleManager<IdentityRole> roleManager,
             ApplicationDbContext context,  // ADD THIS PARAMETER)
-            IShoppingCartService cartService, IFileService fileService)
+            IShoppingCartService cartService, IFileService fileService,IOrderService orderService)
         {
             _userManager = userManager;
             _signInManager = signInManager;
@@ -31,6 +32,7 @@ namespace MobileShop.Controllers
             _context = context;  // ADD THIS
             _cartService = cartService;
             _fileService = fileService;
+            _orderService = orderService;
         }
         [HttpGet]
         [AllowAnonymous]
@@ -397,6 +399,33 @@ namespace MobileShop.Controllers
         public IActionResult AccessDenied()
         {
             return View();
+        }
+        
+        
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> Orders()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+                return NotFound();
+
+            var orders = await _orderService.GetUserOrdersAsync(user.Id);
+            ViewBag.CartItemCount = await _cartService.GetCartItemCountAsync();
+    
+            return View(orders);
+        }
+        
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> OrderDetails(int id)
+        {
+            var order = await _orderService.GetOrderByIdAsync(id);
+            if (order == null)
+                return NotFound();
+
+            ViewBag.CartItemCount = await _cartService.GetCartItemCountAsync();
+            return View(order);
         }
     }
 }

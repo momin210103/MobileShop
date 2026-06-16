@@ -4,6 +4,9 @@ using MobileShop.Data;
 using MobileShop.Interfaces;
 using MobileShop.Models;
 using MobileShop.Services;
+using Stripe;
+using FileService = MobileShop.Services.FileService;
+using ProductService = MobileShop.Services.ProductService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,11 +16,15 @@ builder.Services.AddControllersWithViews();
 // Database Context
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
+// Stripe Configuration
+builder.Services.Configure<StripeSettings>(builder.Configuration.GetSection("Stripe"));
 // Register Custom Services for Dependency Injection
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IShoppingCartService, ShoppingCartService>();
 builder.Services.AddScoped<IFileService, FileService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<IReportService, ReportService>();
 
 // Identity Configuration
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
@@ -69,6 +76,8 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseSession();
 
+
+StripeConfiguration.ApiKey = builder.Configuration["Stripe:SecretKey"];
 app.UseAuthentication();
 app.UseAuthorization();
 
@@ -78,6 +87,10 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     await DbInitializer.SeedAsync(services);
 }
+
+app.MapControllerRoute(
+    name: "areas",
+    pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}");
 
 app.MapControllerRoute(
     name: "default",
