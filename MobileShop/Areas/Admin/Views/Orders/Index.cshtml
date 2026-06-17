@@ -81,7 +81,7 @@
                     </td>
                     <td>@order.OrderDate.ToString("MMM dd, yyyy HH:mm")</td>
                     <td>
-                        <a asp-area="" asp-controller="Account" asp-action="OrderDetails" asp-route-id="@order.Id" class="btn btn-sm btn-outline-primary">
+                        <a asp-area="Admin" asp-controller="Orders" asp-action="Details" asp-route-id="@order.Id" class="btn btn-sm btn-outline-primary">
                             <i class="bi bi-eye"></i>
                         </a>
                         <a asp-action="Invoice" asp-route-id="@order.Id" class="btn btn-sm btn-outline-info" target="_blank">
