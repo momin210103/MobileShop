@@ -10,7 +10,7 @@
 
 <div class="card shadow-sm">
     <div class="card-body p-4">
-        <form asp-action="Edit" method="post">
+        <form asp-action="Edit" method="post" enctype="multipart/form-data">
             <input type="hidden" asp-for="Id" />
             <input type="hidden" asp-for="CreatedAt" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -28,9 +28,9 @@
             </div>
 
             <div class="mb-3">
-                <label asp-for="ImageUrl" class="form-label">Image URL</label>
-                <input asp-for="ImageUrl" class="form-control" />
-                <span asp-validation-for="ImageUrl" class="text-danger"></span>
+                <label asp-for="CategoryImage" class="form-label"></label>
+                <input asp-for="CategoryImage" class="form-control" type="file" accept="image/*" />
+                <small class="text-muted"> Upload a Category Image (Optional)</small>
             </div>
 
             <div class="mb-3">

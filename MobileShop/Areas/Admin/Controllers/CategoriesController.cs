@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MobileShop.Data;
+using MobileShop.Interfaces;
 using MobileShop.Models;
 
 namespace MobileShop.Areas.Admin.Controllers
@@ -11,10 +12,12 @@ namespace MobileShop.Areas.Admin.Controllers
     public class CategoriesController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IFileService _fileService;
 
-        public CategoriesController(ApplicationDbContext context)
+        public CategoriesController(ApplicationDbContext context, IFileService fileService)
         {
             _context = context;
+            _fileService = fileService;
         }
         // GET: Admin/Categories
         public async Task<IActionResult> Index()
@@ -47,6 +50,17 @@ namespace MobileShop.Areas.Admin.Controllers
         {
             if (ModelState.IsValid)
             {
+                if (category.CategoryImage != null)
+                {
+                    var imagePath = await _fileService.SaveFileAsync(category.CategoryImage, "images/category");
+                    if (!string.IsNullOrEmpty(imagePath))
+                    {
+                        if(!string.IsNullOrEmpty(category.ImageUrl))
+                            _fileService.DeleteFile(category.ImageUrl);
+                        category.ImageUrl = imagePath;
+                        
+                    }
+                }
                 _context.Categories.Add(category);
                 await _context.SaveChangesAsync();
                 TempData["Success"] = "Category created successfully.";
@@ -77,6 +91,18 @@ namespace MobileShop.Areas.Admin.Controllers
             {
                 try
                 {
+                    
+                    if (category.CategoryImage != null)
+                    {
+                        var imagePath = await _fileService.SaveFileAsync(category.CategoryImage, "images/category");
+                        if (!string.IsNullOrEmpty(imagePath))
+                        {
+                            if(!string.IsNullOrEmpty(category.ImageUrl))
+                                _fileService.DeleteFile(category.ImageUrl);
+                            category.ImageUrl = imagePath;
+                        
+                        }
+                    }
                     _context.Update(category);
                     await _context.SaveChangesAsync();
                     TempData["Success"] = "Category updated successfully.";
