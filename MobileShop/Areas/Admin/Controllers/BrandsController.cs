@@ -122,5 +122,21 @@ public class BrandsController : Controller
         return _context.Brands.Any(e => e.Id == id);
     }
     
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var brand = await _context.Brands.FindAsync(id);
+        if (brand == null)
+            return NotFound();
+
+        // Soft delete implementation: Flagging rather than destructive removing
+        brand.IsActive = false;
+        await _context.SaveChangesAsync();
+
+        TempData["Success"] = "Category deleted successfully.";
+        return RedirectToAction(nameof(Index));
+    }
+    
     
 }
