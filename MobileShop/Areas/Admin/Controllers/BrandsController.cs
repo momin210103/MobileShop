@@ -58,4 +58,69 @@ public class BrandsController : Controller
     }
     
     
+    //GET: Admin/Brand/Edit
+    public async Task<IActionResult> Edit(int id)
+    {
+        var brand = await _context.Brands.FindAsync(id);
+        if (brand == null)
+        {
+            return NotFound();
+        }
+        return View(brand);
+        
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(int id, Brand brand)
+    {
+        if (id != brand.Id)
+        {
+            return NotFound();
+        }
+
+        if (ModelState.IsValid)
+        {
+            try
+            {
+                
+                if (brand.Logo != null)
+                {
+                    var logoPath = await _fileService.SaveFileAsync(brand.Logo, "images/brand");
+                    if (!string.IsNullOrEmpty(logoPath))
+                    {
+                        if(!string.IsNullOrEmpty(brand.LogoUrl))
+                            _fileService.DeleteFile(brand.LogoUrl);
+                        brand.LogoUrl = logoPath;
+                        
+                    }
+                }
+                _context.Update(brand);
+                await _context.SaveChangesAsync();
+                TempData["Success"] = "brand updated successfully.";
+                return RedirectToAction(nameof(Index));
+
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!BrandExists(brand.Id))
+                {
+                    return NotFound();
+                }
+
+                throw;
+            }
+            
+        }
+
+        return View(brand);
+
+    }
+
+    private bool BrandExists(int id)
+    {
+        return _context.Brands.Any(e => e.Id == id);
+    }
+    
+    
 }
