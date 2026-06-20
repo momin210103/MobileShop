@@ -79,9 +79,9 @@ public class ProductsController : Controller
     }
     
     // POST: Admin/Products/Create
-[HttpPost]
-[ValidateAntiForgeryToken]
-public async Task<IActionResult> Create([Bind("Name,Model,CategoryId,BrandId,OriginalPrice,SalePrice,StockQuantity,ShortDescription,Description,IsActive,IsFeatured,IsNewArrival,IsBestseller")] Product product, List<IFormFile> images)
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create([Bind("Name,Model,CategoryId,BrandId,OriginalPrice,SalePrice,StockQuantity,ShortDescription,Description,IsActive,IsFeatured,IsNewArrival,IsBestseller")] Product product, List<IFormFile> images)
 {
     // Remove EF validation errors for complex navigation properties to prevent false validation failures
     ModelState.Remove("Category");
@@ -126,5 +126,44 @@ public async Task<IActionResult> Create([Bind("Name,Model,CategoryId,BrandId,Ori
     return View(product);
 }
 
+
+    // GET: Admin/Products/GetLatestProductId
+    [HttpGet]
+    public async Task<IActionResult> GetLatestProductId()
+    {
+        // Fetch only the ID of the most recently inserted product to minimize database transmission payload
+        var latest = await _context.Products
+            .OrderByDescending(p => p.Id)
+            .Select(p => new { id = p.Id })
+            .FirstOrDefaultAsync();
+
+        // Return the result as a JSON object, defaulting to an ID of 0 if the table is currently empty
+        return Json(latest ?? new { id = 0 });
+    }
     
+    // POST: Admin/Products/AddSpecification
+    [HttpPost]
+    public async Task<IActionResult> AddSpecification(int productId, string name, string value, string? groupName)
+    {
+        // Initialize a new specification entity mapping technical attributes
+        var spec = new ProductSpecification
+        {
+            ProductId = productId,
+            Name = name,
+            Value = value,
+            GroupName = groupName // Optional parameter enabling dynamic categorization groupings
+        };
+
+        _context.ProductSpecifications.Add(spec);
+        await _context.SaveChangesAsync(); // Persists and generates the database-level spec.Id
+
+        // Return an anonymous JSON payload indicating successful execution state alongside the record identity
+        return Json(new { success = true, id = spec.Id });
+    }
+
+// Helper method used to verify product existence within the master context
+    private bool ProductExists(int id)
+    {
+        return _context.Products.Any(e => e.Id == id);
+    }
 }
