@@ -275,4 +275,20 @@ public class ProductsController : Controller
 
         return View(product);
     }
+    
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var product = await _context.Products.FindAsync(id);
+        if (product == null)
+            return NotFound();
+
+        // Soft delete
+        product.IsActive = false;
+        await _context.SaveChangesAsync();
+
+        TempData["Success"] = "Product deleted successfully.";
+        return RedirectToAction(nameof(Index));
+    }
 }
