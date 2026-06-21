@@ -196,64 +196,83 @@ public class ProductsController : Controller
         // Return a lightweight status verification result payload to confirm data pipeline clearance
         return Json(new { success = true });
     }
-    
+
     [HttpPost]
-[ValidateAntiForgeryToken]
-public async Task<IActionResult> Edit(int id, [Bind("Id,Name,Model,CategoryId,BrandId,OriginalPrice,SalePrice,StockQuantity,ShortDescription,Description,IsActive,IsFeatured,IsNewArrival,IsBestseller,CreatedAt,MainImageUrl")] Product product, List<IFormFile> images)
-{
-   if (id != product.Id)
-      return NotFound();
-    // Remove validation errors for navigation properties
-   ModelState.Remove("Brand");
-   ModelState.Remove("ProductImages");
-   ModelState.Remove("Specifications");
-   ModelState.Remove("Reviews");
-   ModelState.Remove("OrderItems");
-   ModelState.Remove("WishlistItems");
-
-   // DEBUG: Log all model state errors
-
-
-    if (ModelState.IsValid)
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(int id,
+        [Bind(
+            "Id,Name,Model,CategoryId,BrandId,OriginalPrice,SalePrice,StockQuantity,ShortDescription,Description,IsActive,IsFeatured,IsNewArrival,IsBestseller,CreatedAt,MainImageUrl")]
+        Product product, List<IFormFile> images)
     {
-       try
-     {
-         // Update main image if provided
-        if (images.Count > 0)
-         {
-            if (!string.IsNullOrEmpty(product.MainImageUrl))
-               _fileService.DeleteFile(product.MainImageUrl);
-            product.MainImageUrl = await _fileService.SaveFileAsync(images[0], "images/products");
-        }
-        product.UpdatedAt = DateTime.Now;
-        _context.Update(product);
-
-        // Save additional images
-       for (int i = 1; i < images.Count; i++)
-       {
-          var imagePath = await _fileService.SaveFileAsync(images[i], "images/products");
-          _context.ProductImages.Add(new ProductImage
-           {
-              ProductId = product.Id,
-              ImageUrl = imagePath,
-              DisplayOrder = i
-          });
-       }
-
-      await _context.SaveChangesAsync();
-      TempData["Success"] = "Product updated successfully.";
-      return RedirectToAction(nameof(Index));
-      }
-     catch (DbUpdateConcurrencyException)
-     {
-        if (!ProductExists(product.Id))
+        if (id != product.Id)
             return NotFound();
-                    throw;
-     }
-   }
+        // Remove validation errors for navigation properties
+        ModelState.Remove("Brand");
+        ModelState.Remove("ProductImages");
+        ModelState.Remove("Specifications");
+        ModelState.Remove("Reviews");
+        ModelState.Remove("OrderItems");
+        ModelState.Remove("WishlistItems");
 
-     ViewBag.Categories = await _context.Categories.Where(c => c.IsActive).ToListAsync();
-     ViewBag.Brands = await _context.Brands.Where(b => b.IsActive).ToListAsync();
-     return View(product);
-}
+        // DEBUG: Log all model state errors
+
+
+        if (ModelState.IsValid)
+            try
+            {
+                // Update main image if provided
+                if (images.Count > 0)
+                {
+                    if (!string.IsNullOrEmpty(product.MainImageUrl))
+                        _fileService.DeleteFile(product.MainImageUrl);
+                    product.MainImageUrl = await _fileService.SaveFileAsync(images[0], "images/products");
+                }
+
+                product.UpdatedAt = DateTime.Now;
+                _context.Update(product);
+
+                // Save additional images
+                for (var i = 1; i < images.Count; i++)
+                {
+                    var imagePath = await _fileService.SaveFileAsync(images[i], "images/products");
+                    _context.ProductImages.Add(new ProductImage
+                    {
+                        ProductId = product.Id,
+                        ImageUrl = imagePath,
+                        DisplayOrder = i
+                    });
+                }
+
+                await _context.SaveChangesAsync();
+                TempData["Success"] = "Product updated successfully.";
+                return RedirectToAction(nameof(Index));
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ProductExists(product.Id))
+                    return NotFound();
+                throw;
+            }
+
+        ViewBag.Categories = await _context.Categories.Where(c => c.IsActive).ToListAsync();
+        ViewBag.Brands = await _context.Brands.Where(b => b.IsActive).ToListAsync();
+        return View(product);
+    }
+
+    public async Task<IActionResult> Details(int id)
+    {
+        var product = await _context.Products
+            .Include(p => p.Category)
+            .Include(p => p.Brand)
+            .Include(p => p.ProductImages)
+            .Include(p => p.Specifications)
+            .Include(p => p.Reviews)
+            .ThenInclude(r => r.User)
+            .FirstOrDefaultAsync(p => p.Id == id);
+
+        if (product == null)
+            return NotFound();
+
+        return View(product);
+    }
 }
