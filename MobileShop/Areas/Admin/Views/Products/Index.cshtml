@@ -7,7 +7,7 @@
     <h3><i class="bi bi-phone"></i> Products</h3>
     <div>
         <a asp-action="ExportToExcel" class="btn btn-success"><i class="bi bi-file-earmark-excel"></i> Export</a>
-        <button type="button" class="btn btn-info">
+        <button type="button" class="btn btn-info" data-bs-toggle="modal" data-bs-target="#importModal">
             <i class="bi bi-upload"></i> Import
         </button>
         <a asp-area="Admin" asp-controller="Products" asp-action="Create" class="btn btn-primary"><i
@@ -141,3 +141,28 @@
         </ul>
     </nav>
 }
+
+<!-- Import Modal -->
+<div class="modal fade" id="importModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Import Products</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form asp-action="ImportFromExcel" method="post" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Select Excel File</label>
+                        <input type="file" name="file" class="form-control" accept=".xlsx,.xls" required />
+                        <small class="text-muted">Download the <a asp-action="ExportToExcel">template</a> for correct format.</small>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Import</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -394,4 +394,58 @@ public async Task<IActionResult> Edit(
 
         return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Products.xlsx");
     }
+    
+    
+    [HttpPost]
+    public async Task<IActionResult> ImportFromExcel(IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+        {
+            TempData["Error"] = "Please select a file.";
+            return RedirectToAction(nameof(Index));
+        }
+
+        try
+        {
+            using var stream = new MemoryStream();
+            await file.CopyToAsync(stream);
+            stream.Position = 0;
+
+            using var workbook = new XLWorkbook(stream);
+            var worksheet = workbook.Worksheet(1);
+            var rows = worksheet.RowsUsed().Skip(1); // Skip header
+
+            foreach (var row in rows)
+            {
+                var categoryid = _context.Categories.Where(c => c.Name.Contains(row.Cell(4).GetString())).FirstOrDefault().Id;
+                var brandid = _context.Brands.Where(c => c.Name.Contains(row.Cell(5).GetString())).FirstOrDefault().Id;
+            
+                if (_context.Products.Where(p => p.CategoryId == categoryid && p.BrandId == brandid && p.Name == row.Cell(2).GetString() && p.Model == row.Cell(3).GetString()).Count() == 0)
+                {
+                    var product = new Product
+                    {
+                        Name = row.Cell(2).GetString(),
+                        Model = row.Cell(3).GetString(),
+                        CategoryId = categoryid,
+                        BrandId = brandid,
+                        OriginalPrice = (decimal)row.Cell(6).GetDouble(),
+                        SalePrice = (decimal)row.Cell(7).GetDouble(),
+                        StockQuantity = (int)row.Cell(8).GetDouble(),
+                        IsFeatured = row.Cell(9).GetString() == "Yes",
+                        IsActive = true
+                    };
+                    _context.Products.Add(product);
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            TempData["Success"] = "Products imported successfully.";
+        }
+        catch (Exception ex)
+        {
+            TempData["Error"] = "Error importing products.";
+        }
+
+        return RedirectToAction(nameof(Index));
+    }
 }
