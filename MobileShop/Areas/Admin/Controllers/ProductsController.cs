@@ -1,3 +1,4 @@
+using ClosedXML.Excel;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -342,5 +343,55 @@ public async Task<IActionResult> Edit(
 
         TempData["Success"] = "Product deleted successfully.";
         return RedirectToAction(nameof(Index));
+    }
+    
+    
+    
+    public async Task<IActionResult> ExportToExcel()
+    {
+        var products = await _context.Products
+            .Include(p => p.Category)
+            .Include(p => p.Brand)
+            .Where(p => p.IsActive)
+            .ToListAsync();
+
+        using var workbook = new XLWorkbook();
+        var worksheet = workbook.Worksheets.Add("Products");
+
+        // Headers
+        worksheet.Cell(1, 1).Value = "ID";
+        worksheet.Cell(1, 2).Value = "Name";
+        worksheet.Cell(1, 3).Value = "Model";
+        worksheet.Cell(1, 4).Value = "Category";
+        worksheet.Cell(1, 5).Value = "Brand";
+        worksheet.Cell(1, 6).Value = "Original Price";
+        worksheet.Cell(1, 7).Value = "Sale Price";
+        worksheet.Cell(1, 8).Value = "Stock";
+        worksheet.Cell(1, 9).Value = "Featured";
+        worksheet.Cell(1, 10).Value = "Active";
+
+        // Data
+        for (int i = 0; i < products.Count; i++)
+        {
+            var p = products[i];
+            worksheet.Cell(i + 2, 1).Value = p.Id;
+            worksheet.Cell(i + 2, 2).Value = p.Name;
+            worksheet.Cell(i + 2, 3).Value = p.Model;
+            worksheet.Cell(i + 2, 4).Value = p.Category?.Name;
+            worksheet.Cell(i + 2, 5).Value = p.Brand?.Name;
+            worksheet.Cell(i + 2, 6).Value = p.OriginalPrice;
+            worksheet.Cell(i + 2, 7).Value = p.SalePrice;
+            worksheet.Cell(i + 2, 8).Value = p.StockQuantity;
+            worksheet.Cell(i + 2, 9).Value = p.IsFeatured ? "Yes" : "No";
+            worksheet.Cell(i + 2, 10).Value = p.IsActive ? "Yes" : "No";
+        }
+
+        worksheet.Columns().AdjustToContents();
+
+        using var stream = new MemoryStream();
+        workbook.SaveAs(stream);
+        stream.Position = 0;
+
+        return File(stream.ToArray(), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Products.xlsx");
     }
 }
