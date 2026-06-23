@@ -21,4 +21,8 @@
       <PackageReference Include="Stripe.net" Version="43.0.0" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Areas\Admin\Views\D\" />
+    </ItemGroup>
+
 </Project>

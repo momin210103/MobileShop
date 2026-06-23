@@ -9,90 +9,167 @@ namespace MobileShop.Services;
 public class ReportService : IReportService
 {
     private readonly ApplicationDbContext _context;
+
     public ReportService(ApplicationDbContext context)
     {
         _context = context;
     }
+
     public async Task<AdminViewModel.DashboardViewModel> GetDashboardDataAsync()
     {
-            var now = DateTime.Now;
-            var thirtyDaysAgo = now.AddDays(-30);
+        var now = DateTime.Now;
+        var thirtyDaysAgo = now.AddDays(-30);
 
-            var totalOrders = await _context.Orders.CountAsync();
-            var totalProducts = await _context.Products.CountAsync();
-            var totalCustomers = await _context.Users.CountAsync();
-            var totalRevenue = await _context.Orders
-                .Where(o => o.PaymentStatus == PaymentStatus.Paid)
+        var totalOrders = await _context.Orders.CountAsync();
+        var totalProducts = await _context.Products.CountAsync();
+        var totalCustomers = await _context.Users.CountAsync();
+        var totalRevenue = await _context.Orders
+            .Where(o => o.PaymentStatus == PaymentStatus.Paid)
+            .SumAsync(o => o.TotalAmount);
+        var pendingOrders = await _context.Orders
+            .CountAsync(o => o.Status == OrderStatus.Pending);
+        var lowStockProducts = await _context.Products
+            .CountAsync(p => p.StockQuantity <= 10);
+
+        var recentOrders = await _context.Orders
+            .Include(o => o.User)
+            .OrderByDescending(o => o.OrderDate)
+            .Take(10)
+            .Select(o => new AdminViewModel.RecentOrderViewModel
+            {
+                OrderId = o.Id,
+                OrderNumber = o.OrderNumber,
+                CustomerName = o.User != null ? o.User.FullName : "Guest",
+                TotalAmount = o.TotalAmount,
+                Status = o.Status.ToString(),
+                OrderDate = o.OrderDate
+            })
+            .ToListAsync();
+
+        var topProducts = _context.OrderItems
+            .Include(oi => oi.Product)
+            .AsEnumerable()
+            .GroupBy(oi => new { oi.ProductId, oi.Product.Name })
+            .Select(g => new AdminViewModel.TopProductViewModel
+            {
+                ProductId = g.Key.ProductId,
+                ProductName = g.Key.Name,
+                UnitsSold = g.Sum(oi => oi.Quantity),
+                Revenue = g.Sum(oi => oi.TotalPrice)
+            })
+            .OrderByDescending(tp => tp.Revenue)
+            .Take(5)
+            .ToList();
+
+        var monthlySales = new List<AdminViewModel.MonthlySalesViewModel>();
+        for (var i = 5; i >= 0; i--)
+        {
+            var month = now.AddMonths(-i);
+            var monthStart = new DateTime(month.Year, month.Month, 1);
+            var monthEnd = monthStart.AddMonths(1);
+
+            var sales = await _context.Orders
+                .Where(o => o.OrderDate >= monthStart && o.OrderDate < monthEnd &&
+                            o.PaymentStatus == PaymentStatus.Paid)
                 .SumAsync(o => o.TotalAmount);
-            var pendingOrders = await _context.Orders
-                .CountAsync(o => o.Status == OrderStatus.Pending);
-            var lowStockProducts = await _context.Products
-                .CountAsync(p => p.StockQuantity <= 10);
 
-            var recentOrders = await _context.Orders
-                .Include(o => o.User)
-                .OrderByDescending(o => o.OrderDate)
-                .Take(10)
-                .Select(o => new AdminViewModel.RecentOrderViewModel
-                {
-                    OrderId = o.Id,
-                    OrderNumber = o.OrderNumber,
-                    CustomerName = o.User != null ? o.User.FullName : "Guest",
-                    TotalAmount = o.TotalAmount,
-                    Status = o.Status.ToString(),
-                    OrderDate = o.OrderDate
-                })
-                .ToListAsync();
+            var orders = await _context.Orders
+                .CountAsync(o => o.OrderDate >= monthStart && o.OrderDate < monthEnd);
 
-            var topProducts = _context.OrderItems
-                .Include(oi => oi.Product)
-                .AsEnumerable()
-                .GroupBy(oi => new { oi.ProductId, oi.Product.Name })
-                .Select(g => new AdminViewModel.TopProductViewModel
-                {
-                    ProductId = g.Key.ProductId,
-                    ProductName = g.Key.Name,
-                    UnitsSold = g.Sum(oi => oi.Quantity),
-                    Revenue = g.Sum(oi => oi.TotalPrice)
-                })
-                .OrderByDescending(tp => tp.Revenue)
-                .Take(5)
-                .ToList();
-
-            var monthlySales = new List<AdminViewModel.MonthlySalesViewModel>();
-            for (int i = 5; i >= 0; i--)
+            monthlySales.Add(new AdminViewModel.MonthlySalesViewModel
             {
-                var month = now.AddMonths(-i);
-                var monthStart = new DateTime(month.Year, month.Month, 1);
-                var monthEnd = monthStart.AddMonths(1);
+                Month = month.ToString("MMM yyyy"),
+                Sales = sales,
+                Orders = orders
+            });
+        }
 
-                var sales = await _context.Orders
-                    .Where(o => o.OrderDate >= monthStart && o.OrderDate < monthEnd && o.PaymentStatus == PaymentStatus.Paid)
-                    .SumAsync(o => o.TotalAmount);
+        return new AdminViewModel.DashboardViewModel
+        {
+            TotalOrders = totalOrders,
+            TotalProducts = totalProducts,
+            TotalCustomers = totalCustomers,
+            TotalRevenue = totalRevenue,
+            PendingOrders = pendingOrders,
+            LowStockProducts = lowStockProducts,
+            RecentOrders = recentOrders,
+            TopProducts = topProducts,
+            MonthlySales = monthlySales
+        };
+    }
 
-                var orders = await _context.Orders
-                    .CountAsync(o => o.OrderDate >= monthStart && o.OrderDate < monthEnd);
+    public async Task<AdminViewModel.SalesReportViewModel> GetSalesReportAsync(DateTime startDate, DateTime endDate)
+    {
+        var orders = await _context.Orders
+            .Where(o => o.OrderDate >= startDate && o.OrderDate <= endDate)
+            .ToListAsync();
 
-                monthlySales.Add(new AdminViewModel.MonthlySalesViewModel
-                {
-                    Month = month.ToString("MMM yyyy"),
-                    Sales = sales,
-                    Orders = orders
-                });
-            }
+        var totalSales = orders
+            .Where(o => o.PaymentStatus == PaymentStatus.Paid)
+            .Sum(o => o.TotalAmount);
 
-            return new AdminViewModel.DashboardViewModel
+        var dailySales = orders
+            .GroupBy(o => o.OrderDate.Date)
+            .Select(g => new AdminViewModel.DailySalesViewModel
             {
-                TotalOrders = totalOrders,
-                TotalProducts = totalProducts,
-                TotalCustomers = totalCustomers,
-                TotalRevenue = totalRevenue,
-                PendingOrders = pendingOrders,
-                LowStockProducts = lowStockProducts,
-                RecentOrders = recentOrders,
-                TopProducts = topProducts,
-                MonthlySales = monthlySales
-            };
-        
+                Date = g.Key,
+                Sales = g.Where(o => o.PaymentStatus == PaymentStatus.Paid).Sum(o => o.TotalAmount),
+                OrderCount = g.Count()
+            })
+            .OrderBy(ds => ds.Date)
+            .ToList();
+
+        return new AdminViewModel.SalesReportViewModel
+        {
+            StartDate = startDate,
+            EndDate = endDate,
+            TotalSales = totalSales,
+            TotalOrders = orders.Count,
+            AverageOrderValue = orders.Any() ? totalSales / orders.Count : 0,
+            DailySales = dailySales
+        };
+    }
+
+    public async Task<AdminViewModel.InventoryReportViewModel> GetInventoryReportAsync()
+    {
+        var totalProducts = await _context.Products.CountAsync();
+        var lowStockProducts = await _context.Products
+            .Where(p => p.StockQuantity <= 10 && p.StockQuantity > 0)
+            .Select(p => new AdminViewModel.LowStockProductViewModel
+            {
+                ProductId = p.Id,
+                ProductName = p.Name,
+                CurrentStock = p.StockQuantity
+            })
+            .ToListAsync();
+
+        var outOfStockCount = await _context.Products
+            .CountAsync(p => p.StockQuantity == 0);
+
+        return new AdminViewModel.InventoryReportViewModel
+        {
+            TotalProducts = totalProducts,
+            LowStockCount = lowStockProducts.Count,
+            OutOfStockCount = outOfStockCount,
+            LowStockProducts = lowStockProducts
+        };
+    }
+
+    public async Task<List<AdminViewModel.TopProductViewModel>> GetTopSellingProductsAsync(int count = 10)
+    {
+        return _context.OrderItems
+            .Include(oi => oi.Product)
+            .GroupBy(oi => new { oi.ProductId, oi.Product.Name })
+            .AsEnumerable()
+            .Select(g => new AdminViewModel.TopProductViewModel
+            {
+                ProductId = g.Key.ProductId,
+                ProductName = g.Key.Name,
+                UnitsSold = g.Sum(oi => oi.Quantity),
+                Revenue = g.Sum(oi => oi.TotalPrice)
+            })
+            .OrderByDescending(tp => tp.UnitsSold)
+            .Take(count)
+            .ToList();
     }
 }

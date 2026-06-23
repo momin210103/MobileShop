@@ -10,11 +10,11 @@ public class AdminViewModel
         public decimal TotalRevenue { get; set; }
         public int PendingOrders { get; set; }
         public int LowStockProducts { get; set; }
-        public List<RecentOrderViewModel> RecentOrders { get; set; } = new List<RecentOrderViewModel>();
-        public List<TopProductViewModel> TopProducts { get; set; } = new List<TopProductViewModel>();
-        public List<MonthlySalesViewModel> MonthlySales { get; set; } = new List<MonthlySalesViewModel>();
+        public List<RecentOrderViewModel> RecentOrders { get; set; } = new();
+        public List<TopProductViewModel> TopProducts { get; set; } = new();
+        public List<MonthlySalesViewModel> MonthlySales { get; set; } = new();
     }
-    
+
     public class RecentOrderViewModel
     {
         public int OrderId { get; set; }
@@ -24,7 +24,7 @@ public class AdminViewModel
         public string Status { get; set; } = string.Empty;
         public DateTime OrderDate { get; set; }
     }
-    
+
     public class TopProductViewModel
     {
         public int ProductId { get; set; }
@@ -32,11 +32,45 @@ public class AdminViewModel
         public int UnitsSold { get; set; }
         public decimal Revenue { get; set; }
     }
-    
+
     public class MonthlySalesViewModel
     {
         public string Month { get; set; } = string.Empty;
         public decimal Sales { get; set; }
         public int Orders { get; set; }
+    }
+
+
+    public class SalesReportViewModel
+    {
+        public DateTime StartDate { get; set; }
+        public DateTime EndDate { get; set; }
+        public decimal TotalSales { get; set; }
+        public int TotalOrders { get; set; }
+        public decimal AverageOrderValue { get; set; }
+        public List<DailySalesViewModel> DailySales { get; set; } = new();
+    }
+
+    public class DailySalesViewModel
+    {
+        public DateTime Date { get; set; }
+        public decimal Sales { get; set; }
+        public int OrderCount { get; set; }
+    }
+
+    public class InventoryReportViewModel
+    {
+        public int TotalProducts { get; set; }
+        public int LowStockCount { get; set; }
+        public int OutOfStockCount { get; set; }
+        public List<LowStockProductViewModel> LowStockProducts { get; set; } = new();
+    }
+
+    public class LowStockProductViewModel
+    {
+        public int ProductId { get; set; }
+        public string ProductName { get; set; } = string.Empty;
+        public int CurrentStock { get; set; }
+        public int Threshold { get; set; } = 10;
     }
 }
