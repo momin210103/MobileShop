@@ -78,6 +78,52 @@ public class UsersController : Controller
         return View(pagedUsers);
     }
 
+    public async Task<IActionResult> Details(string id)
+    {
+        var user = await _userManager.FindByIdAsync(id);
+        if (user == null)
+            return NotFound();
+
+        var roles = await _userManager.GetRolesAsync(user);
+        var orders = await _context.Orders
+            .Where(o => o.UserId == id)
+            .OrderByDescending(o => o.OrderDate)
+            .Take(10)
+            .ToListAsync();
+
+        ViewBag.Roles = roles;
+        ViewBag.Orders = orders;
+
+        return View(user);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> UpdateRole(string id, string role, bool add)
+    {
+        var user = await _userManager.FindByIdAsync(id);
+        if (user == null)
+            return NotFound();
+
+        if (add)
+        {
+            if (!await _userManager.IsInRoleAsync(user, role))
+            {
+                await _userManager.AddToRoleAsync(user, role);
+                TempData["Success"] = $"Role '{role}' added to user.";
+            }
+        }
+        else
+        {
+            if (await _userManager.IsInRoleAsync(user, role))
+            {
+                await _userManager.RemoveFromRoleAsync(user, role);
+                TempData["Success"] = $"Role '{role}' removed from user.";
+            }
+        }
+
+        return RedirectToAction(nameof(Details), new { id });
+    }
+
 
     [HttpPost]
     public async Task<IActionResult> ToggleStatus(string id)
