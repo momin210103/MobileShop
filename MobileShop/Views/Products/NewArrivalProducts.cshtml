@@ -1,0 +1,18 @@
+@model List<MobileShop.Models.Product>
+
+@{
+    ViewData["Title"] = "New Arrival Products";
+}
+
+<div class="container py-4">
+    <h3 class="mb-4">New Arrival Products</h3>
+
+    <div class="row g-4">
+        @foreach (var product in Model)
+        {
+            <div class="col-md-3 col-sm-6">
+                <partial name="_ProductCard" model="product"/>
+            </div>
+        }
+    </div>
+</div>
