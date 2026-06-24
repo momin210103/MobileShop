@@ -1,0 +1,75 @@
+@model MobileShop.ViewModels.ContactViewModel
+
+@{
+    ViewBag.Title = "Contact Us";
+}
+<header>
+    <link rel="stylesheet" href="~/css/contact.css" />
+</header>
+
+<section class="contact-section">
+    <div class="contact-wrapper">
+
+        <!-- Left: Info Panel -->
+        <div class="contact-info">
+            <h2>Get In Touch</h2>
+            <p>We'd love to hear from you. Fill out the form and we'll get back to you shortly.</p>
+
+            <ul class="info-list">
+                <li>
+                    <span class="icon">📍</span>
+                    <span>Pabna, Dhaka, Bangladesh</span>
+                </li>
+                <li>
+                    <span class="icon">📞</span>
+                    <span>+880 1982458419</span>
+                </li>
+                <li>
+                    <span class="icon">✉️</span>
+                    <span>momincse13@gmail.com</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Right: Form Panel -->
+        <div class="contact-form">
+
+            @if (TempData["Success"] != null)
+            {
+                <div class="alert-success">@TempData["Success"]</div>
+            }
+
+            @using (Html.BeginForm("Index", "Contact", FormMethod.Post))
+            {
+                @Html.AntiForgeryToken()
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Name)
+                    @Html.TextBoxFor(m => m.Name, new { @class = "form-control", placeholder = "John Doe" })
+                    @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Email)
+                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "john@example.com" })
+                    @Html.ValidationMessageFor(m => m.Email, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Subject)
+                    @Html.TextBoxFor(m => m.Subject, new { @class = "form-control", placeholder = "How can we help?" })
+                    @Html.ValidationMessageFor(m => m.Subject, "", new { @class = "text-danger" })
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(m => m.Message)
+                    @Html.TextAreaFor(m => m.Message, 5, 0, new { @class = "form-control", placeholder = "Write your message here..." })
+                    @Html.ValidationMessageFor(m => m.Message, "", new { @class = "text-danger" })
+                </div>
+
+                <button type="submit" class="btn-submit">Send Message</button>
+            }
+        </div>
+    </div>
+</section>
+
