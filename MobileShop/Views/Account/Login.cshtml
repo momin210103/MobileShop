@@ -53,10 +53,14 @@
                     <div class="text-center mb-3">
                         <p class="text-muted">Or login with</p>
                         <div class="d-flex justify-content-center gap-2">
-                            <input type="hidden" name="provider" value="Google" />
-                            <button type="submit" class="btn btn-outline-danger">
-                                <i class="bi bi-google"></i> Google
-                            </button>
+                            <form asp-action="ExternalLogin" method="post">
+                                <button type="submit"
+                                        name="provider"
+                                        value="Google"
+                                        class="btn btn-danger">
+                                    Continue with Google
+                                </button>
+                            </form>
                             <input type="hidden" name="provider" value="Facebook" />
                             <button type="submit" class="btn btn-outline-primary">
                                 <i class="bi bi-facebook"></i> Facebook
