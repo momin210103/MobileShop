@@ -97,14 +97,14 @@
                     </div>
                     <div class="card-body">
                         <div class="row g-3">
-                            <div class="col-md-6">
+                            @*<div class="col-md-6">
                                 <div class="form-check card p-3">
                                     <input class="form-check-input" type="radio" asp-for="PaymentMethod" value="CreditCard" id="paymentCard" checked />
                                     <label class="form-check-label" for="paymentCard">
                                         <i class="bi bi-credit-card"></i> Credit/Debit Card
                                     </label>
                                 </div>
-                            </div>
+                            </div>*@
                             <div class="col-md-6">
                                 <div class="form-check card p-3">
                                     <input class="form-check-input" type="radio" asp-for="PaymentMethod" value="Stripe" id="paymentStripe" />
@@ -113,22 +113,22 @@
                                     </label>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            @*<div class="col-md-6">
                                 <div class="form-check card p-3">
                                     <input class="form-check-input" type="radio" asp-for="PaymentMethod" value="PayPal" id="paymentPayPal" />
                                     <label class="form-check-label" for="paymentPayPal">
                                         <i class="bi bi-paypal"></i> PayPal
                                     </label>
                                 </div>
-                            </div>
-                            <div class="col-md-6">
+                            </div>*@
+                            @*<div class="col-md-6">
                                 <div class="form-check card p-3">
                                     <input class="form-check-input" type="radio" asp-for="PaymentMethod" value="UPI" id="paymentUPI" />
                                     <label class="form-check-label" for="paymentUPI">
                                         <i class="bi bi-phone"></i> UPI / Net Banking
                                     </label>
                                 </div>
-                            </div>
+                            </div>*@
                             <div class="col-md-6">
                                 <div class="form-check card p-3">
                                     <input class="form-check-input" type="radio" asp-for="PaymentMethod" value="CashOnDelivery" id="paymentCOD" />
