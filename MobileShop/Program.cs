@@ -26,6 +26,11 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IReportService, ReportService>();
 
+// ADD THIS — HttpClient version, not AddScoped
+// Why AddHttpClient? It manages HttpClient connections properly
+// Never use 'new HttpClient()' — it causes production socket issues
+builder.Services.AddHttpClient<ISSLCommerzService, SSLCommerzService>();
+
 // Identity Configuration
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
     {

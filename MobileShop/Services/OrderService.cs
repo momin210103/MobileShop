@@ -114,6 +114,13 @@ public class OrderService : IOrderService
 
         order.PaymentStatus = PaymentStatus.Paid;
         order.TransactionId = transactionId;
+    
+        // Update order status to Processing after payment confirmed
+        // Only update if still Pending — don't overwrite Shipped/Delivered
+        if (order.Status == OrderStatus.Pending)
+        {
+            order.Status = OrderStatus.Processing;
+        }
             
         await _context.SaveChangesAsync();
         return true;
