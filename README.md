@@ -9,7 +9,9 @@
 A feature-rich, production-grade e-commerce application tailored for mobile device retail. Built on a clean, scalable architecture using **ASP.NET Core 8.0 MVC**, **Entity Framework Core**, and **SQL Server**. It integrates multiple payment options, third-party authentication, automated email alerts, and an administrative management dashboard.
 
 ---
+## Live Demo
 
+[![Live Demo](https://img.shields.io/badge/🚀-Live%20Demo-success?style=for-the-badge)](https://mobileshop-2c8y.onrender.com)
 ## 🌟 Key Features
 
 ### 🛒 Customer Experience
